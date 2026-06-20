@@ -16,3 +16,5 @@ build
 *.log
 *.tar.gz
 test_*.py
+frappe-bench/
+*.backup
