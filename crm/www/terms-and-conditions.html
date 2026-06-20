@@ -1,0 +1,959 @@
+{% extends "templates/web.html" %}
+
+{% block page_content %}
+
+<style>
+    html,
+    body {
+        margin: 0;
+        height: 100%;
+        overflow: hidden;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        background: #fafbfa;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+        padding-top: 72px !important;
+    }
+
+    /* MAIN LAYOUT */
+    .privacy-layout {
+        display: flex;
+        height: calc(100vh - 72px);
+        background: #fafbfa;
+    }
+
+    /* SIDEBAR */
+    .privacy-sidebar {
+        width: 280px;
+        background: #ffffff;
+        border-right: 1px solid rgba(139, 58, 139, 0.08);
+        position: fixed;
+        top: 72px;
+        left: 0;
+        height: calc(100vh - 72px);
+        padding: 28px 22px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+        /* Ensures padding stays within the calc height */
+    }
+
+    /* SIDEBAR INTERNAL SCROLL BOX */
+    .sidebar-top {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        overflow-y: auto;
+        /* Moves the scrollbar specifically to the links area */
+        flex-grow: 1;
+        margin-bottom: 16px;
+        /* Space between links and the button */
+        padding-right: 4px;
+        /* Keeps scrollbar from clipping links */
+    }
+
+    /* SIDEBAR TITLE */
+    .privacy-sidebar h3 {
+        margin: 0;
+        font-size: 13px;
+        font-weight: 700;
+        color: #8b6f8b;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding-left: 10px;
+    }
+
+    /* SIDEBAR LIST */
+    .privacy-sidebar ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    /* SIDEBAR LINKS */
+    .privacy-sidebar a {
+        display: block;
+        padding: 10px 12px;
+        border-radius: 10px;
+        text-decoration: none;
+        color: #5f5067;
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 1.4;
+        transition: all 0.2s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .privacy-sidebar a:hover {
+        background: rgba(139, 58, 139, 0.08);
+        color: #8b3a8b;
+    }
+
+    /* ACTIVE LINK */
+    .privacy-sidebar a.active {
+        background: #f4eaf4;
+        color: #8b3a8b;
+        font-weight: 600;
+    }
+
+    .privacy-sidebar a::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 0;
+        background: rgba(255, 255, 255, 0.18);
+        transition: width 0.25s ease;
+    }
+
+    .privacy-sidebar a.active::before {
+        width: 100%;
+    }
+
+    /* CONTENT AREA */
+    .privacy-content {
+        margin-left: 280px;
+        height: calc(100vh - 72px);
+        overflow-y: auto;
+        padding: 32px 8% 40px;
+        flex: 1;
+        background: #faf7fb;
+        box-sizing: border-box;
+        scroll-behavior: smooth;
+        transition: all 0.3s ease;
+    }
+
+    /* CONTENT BODY */
+    .privacy-body {
+        max-width: 860px;
+        margin: 0 auto;
+    }
+
+    /* MAIN TITLE */
+    .privacy-content h1 {
+        margin: 0 0 28px;
+        font-size: 52px;
+        font-weight: 800;
+        line-height: 1.1;
+        color: #2a1830;
+        letter-spacing: -0.03em;
+        position: relative;
+        word-break: break-word;
+    }
+
+    .privacy-content h1::after {
+        content: "";
+        width: 80px;
+        height: 5px;
+        background: linear-gradient(90deg,
+                #8b3a8b,
+                #b85cb8);
+        border-radius: 999px;
+        position: absolute;
+        left: 0;
+        bottom: -14px;
+    }
+
+    /* SECTION CARDS */
+    .privacy-content section {
+        background: #ffffff;
+        padding: 28px 30px;
+        border-radius: 24px;
+        margin-bottom: 22px;
+        border: 1px solid rgba(139, 58, 139, 0.08);
+        box-shadow:
+            0 4px 20px rgba(16, 24, 40, 0.04),
+            0 1px 2px rgba(16, 24, 40, 0.04);
+        transition: all 0.25s ease;
+        scroll-margin-top: 100px;
+    }
+
+    .privacy-content section:hover {
+        transform: translateY(-2px);
+        box-shadow:
+            0 10px 30px rgba(139, 58, 139, 0.08),
+            0 2px 6px rgba(139, 58, 139, 0.05);
+    }
+
+    /* SECTION HEADINGS */
+    .privacy-content h2 {
+        margin: 0 0 6px;
+        font-size: 28px;
+        font-weight: 700;
+        line-height: 1.3;
+        color: #35203b;
+        letter-spacing: -0.02em;
+        position: relative;
+        padding-left: 18px;
+    }
+
+    .privacy-content h2::before {
+        content: "";
+        width: 6px;
+        height: 32px;
+        border-radius: 999px;
+        background: linear-gradient(180deg,
+                #8b3a8b,
+                #c06ac0);
+        position: absolute;
+        left: 0;
+        top: 2px;
+    }
+
+    /* PARAGRAPHS */
+    .privacy-content p {
+        margin-top: 10px;
+        margin-bottom: 0;
+        color: #65596d;
+        font-size: 16px;
+        line-height: 1.95;
+        font-weight: 400;
+        text-align: justify;
+        text-justify: inter-word;
+        white-space: pre-line;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        hyphens: auto;
+    }
+
+    /* LINKS */
+    .privacy-content a {
+        color: #8b3a8b;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .privacy-content a:hover {
+        text-decoration: underline;
+        color: #6f2f6f;
+    }
+
+    /* EMPHASIS */
+    .privacy-content strong {
+        color: #4b2454;
+        font-weight: 700;
+    }
+
+    /* ACTIVE TARGET */
+    .privacy-content section:target {
+        border-color: rgba(139, 58, 139, 0.22);
+        box-shadow:
+            0 12px 35px rgba(139, 58, 139, 0.10),
+            0 2px 8px rgba(139, 58, 139, 0.06);
+    }
+
+    /* SCROLLBAR */
+    .privacy-content::-webkit-scrollbar {
+        width: 10px;
+    }
+
+    .privacy-content::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .privacy-content::-webkit-scrollbar-thumb {
+        background: rgba(139, 58, 139, 0.35);
+        border-radius: 999px;
+    }
+
+    .privacy-content::-webkit-scrollbar-thumb:hover {
+        background: rgba(139, 58, 139, 0.55);
+    }
+
+    .privacy-content {
+        scrollbar-width: thin;
+        scrollbar-color: rgba(139, 58, 139, 0.35) transparent;
+    }
+
+    /* SIDEBAR SCROLLBAR */
+    .privacy-sidebar::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .privacy-sidebar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .privacy-sidebar::-webkit-scrollbar-thumb {
+        background: #f7caf7;
+        border-radius: 999px;
+    }
+
+    .privacy-sidebar::-webkit-scrollbar-thumb:hover {
+        background: #f7caf7;
+    }
+
+    .privacy-sidebar {
+        scrollbar-width: thin;
+        scrollbar-color: #f7caf7 transparent;
+    }
+
+    /* SIDEBAR TOGGLE */
+    .sidebar-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        width: 100%;
+        border: none;
+        background: #f7f3f8;
+        padding: 12px 14px;
+        border-radius: 12px;
+        cursor: pointer;
+        color: #3d2b46;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.25s ease;
+    }
+
+    .sidebar-toggle:hover {
+        background: rgba(139, 58, 139, 0.08);
+        color: #8b3a8b;
+    }
+
+    .toggle-arrow {
+        font-size: 18px;
+        transition: transform 0.3s ease;
+    }
+
+    /* COLLAPSED SIDEBAR */
+    .privacy-layout.sidebar-collapsed .privacy-sidebar {
+        width: 92px;
+        padding: 28px 14px;
+    }
+
+    .privacy-layout.sidebar-collapsed .privacy-sidebar h3,
+    .privacy-layout.sidebar-collapsed .privacy-sidebar a,
+    .privacy-layout.sidebar-collapsed .toggle-text {
+        opacity: 0;
+        visibility: hidden;
+        width: 0;
+        overflow: hidden;
+    }
+
+    .privacy-layout.sidebar-collapsed .privacy-sidebar ul {
+        align-items: center;
+    }
+
+    .privacy-layout.sidebar-collapsed .privacy-sidebar li {
+        width: 100%;
+    }
+
+    .privacy-layout.sidebar-collapsed .privacy-sidebar a {
+        display: none;
+    }
+
+    .privacy-layout.sidebar-collapsed .sidebar-toggle {
+        justify-content: center;
+    }
+
+    .privacy-layout.sidebar-collapsed .toggle-arrow {
+        transform: rotate(180deg);
+    }
+
+    /* CONTENT EXPAND */
+    .privacy-layout.sidebar-collapsed .privacy-content {
+        margin-left: 92px;
+    }
+
+    /* OVERLAY */
+    .sidebar-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.35);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        z-index: 999;
+    }
+
+    .sidebar-top {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    .privacy-layout.mobile-sidebar-open+.sidebar-overlay {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    /* TABLET */
+    @media (max-width: 1100px) {
+        .privacy-sidebar {
+            width: 240px;
+        }
+
+        .privacy-content {
+            margin-left: 240px;
+        }
+
+        .privacy-layout.sidebar-collapsed .privacy-content {
+            margin-left: 82px;
+        }
+    }
+
+    /* MOBILE */
+    @media (max-width: 992px) {
+
+        html,
+        body {
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .privacy-layout {
+            height: calc(100vh - 72px);
+            overflow: hidden;
+        }
+
+        .privacy-sidebar {
+            position: fixed;
+            top: 72px;
+            left: 0;
+            width: 240px;
+            height: calc(100vh - 72px);
+            overflow-y: auto;
+        }
+
+        .privacy-content {
+            margin-left: 240px;
+            width: calc(100% - 240px);
+            height: calc(100vh - 72px);
+            overflow-y: auto;
+            padding: 24px 14px 40px;
+            box-sizing: border-box;
+        }
+
+        .privacy-body {
+            width: 100%;
+            max-width: 100%;
+        }
+
+        /* MAIN TITLE */
+        .privacy-content h1 {
+            font-size: 30px;
+            line-height: 1.2;
+            margin: 0 0 22px;
+        }
+
+        .privacy-content h1::after {
+            width: 60px;
+            height: 4px;
+            bottom: -12px;
+        }
+
+        /* SECTION CARDS */
+        .privacy-content section {
+            padding: 16px 14px;
+            border-radius: 16px;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        /* SECTION HEADINGS */
+        .privacy-content h2 {
+            font-size: 20px;
+            line-height: 1.4;
+            margin-bottom: 4px;
+            padding-left: 14px;
+        }
+
+        .privacy-content h2::before {
+            width: 5px;
+            height: 26px;
+        }
+
+        /* PARAGRAPHS */
+        .privacy-content p {
+            margin-top: 8px;
+            font-size: 14px;
+            line-height: 1.9;
+            text-align: justify;
+            text-justify: inter-word;
+            white-space: pre-line;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+            color: #65596d;
+        }
+
+        /* COLLAPSED */
+        .privacy-layout.sidebar-collapsed .privacy-sidebar {
+            width: 72px;
+            padding: 20px 8px;
+        }
+
+        .privacy-layout.sidebar-collapsed .privacy-content {
+            margin-left: 72px;
+            width: calc(100% - 72px);
+        }
+    }
+
+    .privacy-content h3 {
+        margin-top: 16px;
+        margin-bottom: 6px;
+        font-size: 20px;
+        font-weight: 600;
+        color: #4b2454;
+        line-height: 1.5;
+    }
+
+    .privacy-content ul {
+        margin-top: 10px;
+        padding-left: 20px;
+    }
+
+    .privacy-content li {
+        margin-bottom: 8px;
+        font-size: 16px;
+        line-height: 1.9;
+        color: #65596d;
+    }
+
+    /* Ensure the last content block can scroll to the top threshold */
+    .privacy-content section:last-of-type {
+        margin-bottom: 22px !important;
+    }
+</style>
+
+<div class="privacy-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="privacy-sidebar">
+        <div class="sidebar-top">
+            <h3>Contents</h3>
+            <ul>
+                <li><a href="#" data-target="intro" class="active">Agreement</a></li>
+                <li><a href="#" data-target="definitions">Definitions</a></li>
+                <li><a href="#" data-target="account-registration">Account Registration</a></li>
+                <li><a href="#" data-target="subscription-plans">Subscription Plans and Payments</a></li>
+                <li><a href="#" data-target="acceptable-use">Acceptable Use Policy</a></li>
+                <li><a href="#" data-target="intellectual-property">Intellectual Property</a></li>
+                <li><a href="#" data-target="data-privacy">Data Privacy and Security</a></li>
+                <li><a href="#" data-target="service-availability">Service Availability and Support</a></li>
+                <li><a href="#" data-target="confidentiality">Confidentiality</a></li>
+                <li><a href="#" data-target="disclaimer">Disclaimer of Warranties</a></li>
+                <li><a href="#" data-target="limitation">Limitation of Liability</a></li>
+                <li><a href="#" data-target="indemnification">Indemnification</a></li>
+                <li><a href="#" data-target="termination">Term and Termination</a></li>
+                <li><a href="#" data-target="governing-law">Governing Law and Dispute Resolution</a></li>
+                <li><a href="#" data-target="force-majeure">Force Majeure</a></li>
+                <li><a href="#" data-target="changes-terms">Changes to Terms</a></li>
+                <li><a href="#" data-target="general-provisions">General Provisions</a></li>
+                <li><a href="#" data-target="contact-info">Contact Information</a></li>
+            </ul>
+        </div>
+
+        <button class="sidebar-toggle" id="sidebarToggle">
+            <span class="toggle-arrow">←</span>
+            <span class="toggle-text">Collapse</span>
+        </button>
+    </aside>
+
+    <!-- CONTENT -->
+    <main class="privacy-content" id="privacyContent">
+        <div class="privacy-body">
+
+            <h1>Terms & Conditions</h1>
+
+            <section id="intro">
+                <h2>Agreement</h2>
+                <p>These Terms and Conditions ("Agreement") govern your access to and use of the iPelite CRM software,
+                    platform, and related services ("Services") provided by iPelite ("Company," "we," "us," or "our").
+                    By creating an account or using our Services, you ("User," "Customer," or "you") agree to be bound
+                    by these Terms. If you do not agree, please do not use our Services. We recommend printing or saving
+                    a copy of this Agreement for your records.</p>
+            </section>
+
+            <section id="definitions">
+                <h2>1. Definitions</h2>
+                <ul>
+                    <li>"iPelite" refers to the CRM software platform and all associated products and services offered
+                        by the Company.</li>
+                    <li>"User" means any individual or entity accessing or using the iPelite platform.</li>
+                    <li>"Subscription" means a paid or trial plan that grants access to iPelite Services.</li>
+                    <li>"Data" means any information, content, or material submitted, stored, or processed through the
+                        platform.</li>
+                    <li>"Administrator" means the primary account holder responsible for managing the organisation's
+                        iPelite account.</li>
+                    <li>"Content" means all text, data, information, software, graphics, or other materials that you
+                        upload, store, or transmit through the platform.</li>
+                </ul>
+            </section>
+
+            <section id="account-registration">
+                <h2>2. Account Registration</h2>
+                <p>To use iPelite CRM, you must:</p>
+                <ul>
+                    <li>Provide accurate, complete, and current registration information.</li>
+                    <li>Be at least 18 years of age or the legal age of majority in your jurisdiction.</li>
+                    <li>Have authority to bind your organization to this Agreement if registering on behalf of a
+                        business entity.</li>
+                    <li>Keep your login credentials confidential and notify us immediately at legal@ipelite.com of any
+                        unauthorized access.</li>
+                </ul>
+                <p>You are solely responsible for all activities that occur under your account. iPelite reserves the
+                    right to suspend or terminate accounts that provide false information or violate these Terms, after
+                    providing reasonable notice except in cases of urgent security risk.</p>
+            </section>
+
+            <section id="subscription-plans">
+                <h2>3. Subscription Plans and Payments</h2>
+                <h3>3.1 Subscription Tiers</h3>
+                <p>iPelite offers various subscription plans (Free, Starter, Professional, Enterprise) with different
+                    features and usage limits. Details of each plan are available on our pricing page at
+                    www.ipelite.com/pricing.</p>
+
+                <h3>3.2 Billing</h3>
+                <ul>
+                    <li>Subscriptions are billed in advance on a monthly or annual basis.</li>
+                    <li>All fees are non-refundable except as specified in our Refund Policy available at
+                        www.ipelite.com/refund-policy.</li>
+                    <li>Prices are subject to change with 30 days advance written notice to your registered email
+                        address.</li>
+                    <li>Failure to pay may result in suspension of your account after a 7-day grace period. Termination
+                        for non-payment will follow after an additional 7 days.</li>
+                </ul>
+
+                <h3>3.3 Taxes</h3>
+                <p>You are responsible for all applicable taxes, including GST, TDS, or other taxes imposed by your
+                    jurisdiction. iPelite will add applicable GST to invoices as required under Indian tax law and will
+                    provide valid tax invoices.</p>
+
+                <h3>3.4 Free Trials</h3>
+                <p>iPelite may offer free trial periods at its discretion. Before a trial converts to a paid plan, you
+                    will receive a reminder notification at least 7 days in advance. Your account will convert to the
+                    selected paid plan only if you do not cancel before the trial expiry date. No charge will be made
+                    without advance notice. You may cancel at any time during the trial at no cost.</p>
+            </section>
+
+            <section id="acceptable-use">
+                <h2>4. Acceptable Use Policy</h2>
+                <p>You agree to use iPelite CRM only for lawful business purposes. You must NOT:</p>
+                <ul>
+                    <li>Use the platform for illegal activities, including fraud, money laundering, or copyright
+                        infringement.</li>
+                    <li>Upload or transmit malware, viruses, or any malicious code.</li>
+                    <li>Attempt to gain unauthorized access to our systems, other accounts, or networks.</li>
+                    <li>Reverse engineer, decompile, or disassemble any part of the platform.</li>
+                    <li>Resell, sublicense, or redistribute access to iPelite without prior written authorization.</li>
+                    <li>Use automated tools to scrape or extract data from the platform without consent.</li>
+                    <li>Violate the privacy rights of individuals or applicable data protection laws.</li>
+                    <li>Send unsolicited bulk emails or engage in spamming activities through the platform.</li>
+                    <li>Use the platform in any manner that could damage, disable, or impair the Services.</li>
+                </ul>
+                <p>iPelite reserves the right to investigate and take appropriate action against any violations,
+                    including suspension of accounts and reporting to law enforcement authorities. We will provide
+                    notice before suspension except where immediate action is necessary to protect other users or the
+                    platform.</p>
+            </section>
+
+            <section id="intellectual-property">
+                <h2>5. Intellectual Property</h2>
+                <h3>5.1 iPelite Ownership</h3>
+                <p>All rights, title, and interest in iPelite software, platform, technology, trademarks, logos, and
+                    content are and shall remain the exclusive property of iPelite and its licensors. This Agreement
+                    does not grant you any ownership rights in our intellectual property. All rights not expressly
+                    granted are reserved.</p>
+
+                <h3>5.2 Your Data</h3>
+                <p>You retain full ownership of all data you input into the iPelite platform. By using our Services, you
+                    grant iPelite a limited, non-exclusive, non-transferable, revocable license to process, store, and
+                    use your data solely for the purpose of providing the Services to you. This license terminates when
+                    you delete your data or close your account.</p>
+
+                <h3>5.3 Feedback</h3>
+                <p>If you voluntarily provide feedback, suggestions, or ideas to iPelite about the Services, you grant
+                    us a non-exclusive, royalty-free, worldwide licence to use such feedback for the purpose of
+                    improving our Services. We are under no obligation to compensate you for feedback, and this clause
+                    does not affect your ownership of your personal data or business data stored on the platform.</p>
+            </section>
+
+            <section id="data-privacy">
+                <h2>6. Data Privacy and Security</h2>
+                <p>iPelite processes your data in accordance with our Privacy Policy (incorporated herein by reference
+                    and available at www.ipelite.com/privacy). You represent and warrant that:</p>
+                <ul>
+                    <li>You have all necessary rights, permissions, and consents to upload data to the platform.</li>
+                    <li>Your data does not violate any applicable laws or third-party rights.</li>
+                    <li>You comply with all applicable data protection laws (including the DPDP Act, 2023, GDPR where
+                        applicable, and other relevant legislation) when processing personal data through iPelite.</li>
+                </ul>
+                <p>You are responsible for maintaining appropriate security controls on your side, including managing
+                    user access levels and permissions within your organisation's iPelite account.</p>
+            </section>
+
+            <section id="service-availability">
+                <h2>7. Service Availability and Support</h2>
+                <h3>7.1 Uptime Commitment</h3>
+                <p>iPelite targets a platform uptime of 99.9% measured monthly (excluding scheduled maintenance and
+                    force majeure events). Planned maintenance will be communicated at least 48 hours in advance through
+                    in-platform notifications or email.</p>
+
+                <h3>7.2 Support</h3>
+                <p>Technical support is provided based on your subscription tier:</p>
+                <ul>
+                    <li>Free: Community forum access only.</li>
+                    <li>Starter: Email support with 48-hour response time.</li>
+                    <li>Professional: Priority email and chat support with 24-hour response time.</li>
+                    <li>Enterprise: Dedicated account manager, phone support, and 4-hour response time SLA.</li>
+                </ul>
+
+                <h3>7.3 Service Modifications</h3>
+                <p>iPelite reserves the right to modify, enhance, or discontinue any feature or aspect of the Services.
+                    We will provide at least 30 days notice before discontinuing any core feature. We will not make
+                    changes that materially reduce core CRM functionality without adequate prior notice and, where
+                    appropriate, an opportunity to export your data.</p>
+            </section>
+
+            <section id="confidentiality">
+                <h2>8. Confidentiality</h2>
+                <p>Both parties agree to keep confidential all non-public information received from the other party that
+                    is marked as confidential or that reasonably should be understood to be confidential given the
+                    nature of the information. Each party will use the other's confidential information only as
+                    necessary to perform obligations under this Agreement. This obligation survives termination of this
+                    Agreement for a period of 3 years. This clause does not apply to information that is publicly known,
+                    independently developed, or required to be disclosed by law.</p>
+            </section>
+
+            <section id="disclaimer">
+                <h2>9. Disclaimer of Warranties</h2>
+                <p>The services are provided "as is" and "as available" without warranties of any kind, either express
+                    or implied, including but not limited to implied warranties of merchantability, fitness for a
+                    particular purpose, and non-infringement. iPelite does not warrant that the services will be
+                    uninterrupted, error-free, or free of harmful components. Your use of the services is at your sole
+                    risk. This disclaimer does not affect statutory rights that cannot be waived under applicable indian
+                    law.</p>
+            </section>
+
+            <section id="limitation">
+                <h2>10. Limitation of Liability</h2>
+                <p>To the maximum extent permitted by applicable law:</p>
+                <ul>
+                    <li>iPelite shall not be liable for indirect, incidental, special, consequential, or punitive
+                        damages, including loss of profits, data, business opportunity, or goodwill, arising from your
+                        use of or inability to use the services.</li>
+                    <li>iPelite's total cumulative liability arising out of or related to this agreement shall not
+                        exceed the amount paid by you to ipelite in the 12 months immediately preceding the claim.</li>
+                    <li>These limitations apply regardless of the form of action and even if ipelite has been advised of
+                        the possibility of such damages.</li>
+                </ul>
+                <p>Nothing in this Agreement limits liability for death, personal injury, fraud, or any liability that
+                    cannot be excluded or limited under applicable Indian law.</p>
+            </section>
+
+            <section id="indemnification">
+                <h2>11. Indemnification</h2>
+                <p>You agree to indemnify, defend, and hold harmless iPelite and its officers, directors, employees, and
+                    agents from any third-party claims, liabilities, damages, losses, and expenses (including reasonable
+                    legal fees) arising out of or related to:</p>
+                <ul>
+                    <li>Your use of the Services in material violation of this Agreement.</li>
+                    <li>Your data or content uploaded to the platform that infringes third-party rights.</li>
+                    <li>Your violation of any applicable laws or third-party rights.</li>
+                </ul>
+                <p>iPelite will notify you promptly of any such claim and cooperate reasonably in the defence.</p>
+            </section>
+
+            <section id="termination">
+                <h2>12. Term and Termination</h2>
+                <h3>12.1 Term</h3>
+                <p>This Agreement remains in effect from the date you first access the Services until terminated by
+                    either party in accordance with these Terms.</p>
+
+                <h3>12.2 Termination by You</h3>
+                <p>You may cancel your subscription at any time through your account settings. Cancellation takes effect
+                    at the end of your current billing period. No refund will be issued for the remaining period unless
+                    specified in the Refund Policy.</p>
+
+                <h3>12.3 Termination by iPelite</h3>
+                <p>iPelite may suspend or terminate your account if you:</p>
+                <ul>
+                    <li>Violate any material provision of this Agreement, after providing 7 days written notice to
+                        remedy the breach (except for serious violations such as illegal activity, security threats, or
+                        abuse, where immediate termination may occur).</li>
+                    <li>Fail to pay subscription fees after a 7-day grace period following the due date.</li>
+                    <li>Engage in activities that are harmful to iPelite, other users, or third parties.</li>
+                </ul>
+
+                <h3>12.4 Effect of Termination</h3>
+                <p>Upon termination, your right to use the Services immediately ceases. You may export your data within
+                    30 days of termination using the platform's data export tools. After this 30-day period, your data
+                    will be permanently deleted from our systems (backup copies within 90 days). iPelite is not liable
+                    for any loss of data following the expiry of this export window.</p>
+            </section>
+
+            <section id="governing-law">
+                <h2>13. Governing Law and Dispute Resolution</h2>
+                <p>This Agreement shall be governed by and construed in accordance with the laws of India, without
+                    regard to its conflict of law provisions. The courts/arbitral tribunals at Chhatrapati Sambhajinagar
+                    (Aurangabad), Maharashtra, India, shall have jurisdiction.</p>
+                <p>Any disputes arising out of or in connection with this Agreement shall first be attempted to be
+                    resolved through good-faith negotiations between the parties within 30 days of written notice of the
+                    dispute. If unresolved, disputes shall be submitted to binding arbitration in accordance with the
+                    Arbitration and Conciliation Act, 1996, with proceedings conducted in English at Chhatrapati
+                    Sambhajinagar (Aurangabad), Maharashtra, India.</p>
+                <p>Notwithstanding the above, either party may seek injunctive or other equitable relief from any court
+                    of competent jurisdiction to prevent irreparable harm.</p>
+            </section>
+
+            <section id="force-majeure">
+                <h2>14. Force Majeure</h2>
+                <p>iPelite shall not be liable for any failure or delay in performance caused by circumstances beyond
+                    our reasonable control, including natural disasters, acts of government or regulatory authority,
+                    power outages, internet disruptions, pandemics, cyber-attacks, or labour disputes. We will resume
+                    performance as soon as reasonably practicable and notify you of any significant impact on the
+                    Services.</p>
+            </section>
+
+            <section id="changes-terms">
+                <h2>15. Changes to Terms</h2>
+                <p>iPelite reserves the right to modify these Terms at any time. We will notify you of material changes
+                    via email and in-platform notifications at least 30 days before the new Terms take effect. If you do
+                    not agree to the revised Terms, you may terminate your account before the effective date without
+                    penalty for early termination. Continued use of the Services after the effective date constitutes
+                    your acceptance of the revised Terms.</p>
+            </section>
+
+            <section id="general-provisions">
+                <h2>16. General Provisions</h2>
+                <ul>
+                    <li>Entire Agreement: This Agreement, together with the Privacy Policy and any applicable Order
+                        Forms or Service Level Agreements, constitutes the entire agreement between the parties
+                        regarding the subject matter hereof, superseding all prior agreements.</li>
+                    <li>Severability: If any provision is found invalid or unenforceable by a court of competent
+                        jurisdiction, the remaining provisions shall continue in full force and effect.</li>
+                    <li>Waiver: Failure or delay by either party to enforce any right shall not constitute a waiver of
+                        that right.</li>
+                    <li>Assignment: You may not assign or transfer this Agreement without our prior written consent.
+                        iPelite may assign this Agreement in connection with a merger, acquisition, or sale of
+                        substantially all assets, with notice to you.</li>
+                    <li>Language: This Agreement is in English. In the event of any conflict with a translated version,
+                        the English version shall prevail.</li>
+                    <li>Notices: Legal notices must be sent to legal@ipelite.com or to our registered address below.
+                        Notices will be deemed received within 48 hours of email transmission or 7 days of postal
+                        delivery.</li>
+                    <li>Relationship: The parties are independent contractors. Nothing in this Agreement creates a
+                        partnership, joint venture, or agency relationship.</li>
+                </ul>
+            </section>
+
+            <section id="contact-info">
+                <h2>17. Contact Information</h2>
+                <p>For any questions regarding these Terms and Conditions, please contact us:</p>
+                <ul>
+                    <li>iPelite CRM – Legal Team</li>
+                    <li>Email: legal@ipelite.com</li>
+                    <li>Phone: +91-9922284662</li>
+                    <li>Address: IP Supershoppee Private Limited, Chhatrapati Sambhajinagar (Aurangabad), Maharashtra,
+                        India</li>
+                    <li>Website: www.ipelite.com</li>
+                </ul>
+            </section>
+
+        </div>
+    </main>
+</div>
+
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+
+        const layout = document.querySelector(".privacy-layout");
+        const sidebarToggle = document.getElementById("sidebarToggle");
+        const links = document.querySelectorAll(".privacy-sidebar a");
+        const contentContainer = document.getElementById("privacyContent");
+        const sections = document.querySelectorAll(".privacy-content section");
+
+        /* SIDEBAR COLLAPSE */
+        sidebarToggle.addEventListener("click", () => {
+            layout.classList.toggle("sidebar-collapsed");
+        });
+
+        let isClickScrolling = false; // Flag to prevent scroll tracker overrides during manual clicks
+        let clickTimeout;
+
+        /* SIDEBAR NAVIGATION */
+        links.forEach(link => {
+            link.addEventListener("click", (e) => {
+                e.preventDefault();
+
+                const targetId = link.dataset.target;
+                const targetSection = document.getElementById(targetId);
+
+                if (!targetSection) return;
+
+                isClickScrolling = true;
+                clearTimeout(clickTimeout);
+
+                links.forEach(l => l.classList.remove("active"));
+                link.classList.add("active");
+
+                link.scrollIntoView({ block: "nearest", behavior: "smooth" });
+
+                // CHANGED: Altered offset from -40 to -100 to pull heading down clean
+                contentContainer.scrollTo({
+                    top: targetSection.offsetTop - 100,
+                    behavior: "smooth"
+                });
+
+                clickTimeout = setTimeout(() => {
+                    isClickScrolling = false;
+                }, 800);
+            });
+        });
+
+        /* ACTIVE LINK SCROLL TRACKING & SIDEBAR AUTO-SCROLL */
+        function updateActiveLink() {
+            if (isClickScrolling) return; // Skip tracking if scroll was caused by a click
+
+            let currentSection = "";
+            const scrollPosition = contentContainer.scrollTop;
+
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 120;
+                const sectionHeight = section.offsetHeight;
+
+                if (
+                    scrollPosition >= sectionTop &&
+                    scrollPosition < sectionTop + sectionHeight
+                ) {
+                    currentSection = section.getAttribute("id");
+                }
+            });
+
+            // Fallback for reaching the exact bottom of the page
+            if (contentContainer.scrollHeight - contentContainer.scrollTop <= contentContainer.clientHeight + 50) {
+                currentSection = sections[sections.length - 1].getAttribute("id");
+            }
+
+            links.forEach(link => {
+                link.classList.remove("active");
+                if (link.dataset.target === currentSection) {
+                    link.classList.add("active");
+
+                    link.scrollIntoView({
+                        block: "nearest",
+                        behavior: "smooth"
+                    });
+                }
+            });
+        }
+
+        contentContainer.addEventListener("scroll", updateActiveLink);
+        updateActiveLink();
+    });
+</script>
+
+{% endblock %}

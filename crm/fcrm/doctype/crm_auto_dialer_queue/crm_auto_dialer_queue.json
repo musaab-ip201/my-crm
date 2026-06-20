@@ -1,0 +1,105 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-04-02 10:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "user",
+  "status",
+  "column_break_1",
+  "total_leads",
+  "completed_leads",
+  "failed_leads",
+  "section_break_2",
+  "current_index",
+  "leads"
+ ],
+ "fields": [
+  {
+   "fieldname": "user",
+   "fieldtype": "Link",
+   "label": "User",
+   "options": "User",
+   "reqd": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Active\nPaused\nStopped\nCompleted",
+   "default": "Active",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_leads",
+   "fieldtype": "Int",
+   "label": "Total Leads",
+   "default": "0"
+  },
+  {
+   "fieldname": "completed_leads",
+   "fieldtype": "Int",
+   "label": "Completed Leads",
+   "default": "0"
+  },
+  {
+   "fieldname": "failed_leads",
+   "fieldtype": "Int",
+   "label": "Failed Leads",
+   "default": "0"
+  },
+  {
+   "fieldname": "section_break_2",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "current_index",
+   "fieldtype": "Int",
+   "label": "Current Index",
+   "default": "0"
+  },
+  {
+   "fieldname": "leads",
+   "fieldtype": "JSON",
+   "label": "Leads Queue"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-04-02 10:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "FCRM",
+ "name": "CRM Auto Dialer Queue",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "Sales User",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "Sales Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

@@ -1,0 +1,9 @@
+<template>
+  <img
+    src="/favicon.png"
+    alt="IPShopy"
+    width="16"
+    height="16"
+    class="object-contain"
+  />
+</template>

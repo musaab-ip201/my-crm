@@ -1,0 +1,330 @@
+{% extends "templates/web.html" %}
+
+{% block style %}
+<style>
+  html,
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    height: 100%;
+    overflow-x: hidden;
+  }
+
+  .navbar,
+  footer,
+  .web-footer,
+  .page-breadcrumbs,
+  .page-header,
+  .page-head {
+    display: none !important;
+  }
+
+  body {
+    padding-top: 0 !important;
+  }
+
+  .web-page-content,
+  .page-content-wrapper,
+  .page_content,
+  .container,
+  .page_content .container {
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  .contact-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(to bottom right, #f3f4f6, #e5e7eb);
+    padding: 12px 16px;
+    box-sizing: border-box;
+  }
+
+  .contact-card {
+    background: white;
+    padding: 20px;
+    border-radius: 24px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    max-width: 512px;
+    margin: 0 auto;
+    transition: all 0.3s ease;
+  }
+
+  .contact-header {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  .contact-header h1 {
+    font-size: 30px;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 6px;
+  }
+
+  .contact-header p {
+    color: #6b7280;
+    font-size: 14px;
+    margin: 0;
+  }
+
+  .form-group {
+    margin-bottom: 10px;
+  }
+
+  .label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 4px;
+    color: #374151;
+    font-weight: 500;
+  }
+
+  .input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+    outline: none;
+    box-sizing: border-box;
+    font-size: 14px;
+  }
+
+  .input:focus {
+    border-color: #d946ef;
+    box-shadow: 0 0 0 3px rgba(217, 70, 239, 0.2);
+  }
+
+  .btn {
+    width: 100%;
+    background: linear-gradient(135deg, #f472b6, #d946ef);
+    color: white;
+    padding: 12px;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    margin-top: 4px;
+  }
+
+  .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 15px rgba(217, 70, 239, 0.3);
+  }
+
+  .btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+
+  .footer-text {
+    font-size: 12px;
+    color: #9ca3af;
+    text-align: center;
+    margin-top: 24px;
+  }
+
+
+  .loader {
+    width: 18px;
+    height: 18px;
+    border: 2px solid white;
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    display: inline-block;
+    animation: spin 0.8s linear infinite;
+  }
+
+  /* Desktop */
+
+  .desk-alert {
+    position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
+    left: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+    z-index: 999999 !important;
+  }
+
+  /* Remove fade animation */
+
+  .desk-alert {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+  }
+
+  /* Mobile */
+
+  @media (max-width: 768px) {
+
+    .desk-alert {
+      top: 16px !important;
+      left: 16px !important;
+      right: 16px !important;
+      width: auto !important;
+      transform: none !important;
+    }
+
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+</style>
+{% endblock %}
+
+{% block page_content %}
+<div class="contact-page">
+  <div class="contact-card">
+
+    <div class="contact-header">
+      <h1>Contact Support</h1>
+      <p>We're here to help you</p>
+    </div>
+    <form id="contact-support-form" novalidate>
+
+      <div class="form-group">
+        <label class="label">Name</label>
+        <input id="name" type="text" placeholder="Enter your name" class="input">
+      </div>
+
+      <div class="form-group">
+        <label class="label">Email</label>
+        <input id="email" type="email" placeholder="Enter your email" class="input">
+      </div>
+
+      <div class="form-group">
+        <label class="label">Your Issue</label>
+        <textarea id="message" rows="3" placeholder="Describe your issue..." class="input"
+          style="resize:none;"></textarea>
+      </div>
+
+      <button id="submit-btn" type="submit" class="btn">
+        <span id="btn-text">Submit</span>
+        <span id="btn-loader" class="loader" style="display:none;"></span>
+      </button>
+
+    </form>
+
+    <p class="footer-text">
+      Support team usually replies within 24 hours
+    </p>
+  </div>
+</div>
+{% endblock %}
+{% block script %}
+<script>
+  frappe.ready(function () {
+    const form = document.getElementById("contact-support-form")
+
+    const btn = document.getElementById("submit-btn")
+    const btnText = document.getElementById("btn-text")
+    const btnLoader = document.getElementById("btn-loader")
+
+    function showError(msg) {
+      frappe.show_alert(
+        {
+          message: msg,
+          indicator: "red"
+        },
+        5
+      )
+    }
+
+    function showSuccess(msg) {
+      frappe.show_alert(
+        {
+          message: msg,
+          indicator: "green"
+        },
+        5
+      )
+    }
+
+    function isValidEmail(email) {
+      const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      return regex.test(email)
+    }
+
+    function isEmptyOrSpaces(value) {
+      return !value || value.trim().length === 0
+    }
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault()
+
+      const name = document.getElementById("name").value
+      const email = document.getElementById("email").value
+      const message = document.getElementById("message").value
+
+
+      if (isEmptyOrSpaces(name)) {
+        showError("Name is required")
+        return
+      }
+
+      if (isEmptyOrSpaces(email)) {
+        showError("Email is required")
+        return
+      }
+
+      if (!isValidEmail(email)) {
+        showError("Please enter a valid email address")
+        return
+      }
+
+      if (isEmptyOrSpaces(message)) {
+        showError("Message cannot be empty")
+        return
+      }
+
+      btn.disabled = true
+      btnText.style.display = "none"
+      btnLoader.style.display = "inline-block"
+
+      frappe.call({
+        method: "crm.api.contact_support.contact_support",
+        args: {
+          name: name.trim(),
+          email: email.trim(),
+          message: message.trim()
+        },
+        callback: function (r) {
+          btn.disabled = false
+          btnText.style.display = "inline"
+          btnLoader.style.display = "none"
+
+          if (r.message && r.message.status === "success") {
+            form.reset()
+
+            showSuccess(
+              "Your request has been submitted successfully! Our team will contact you soon."
+            )
+
+
+          } else {
+            showError("Something went wrong")
+          }
+        },
+        error: function () {
+          btn.disabled = false
+          btnText.style.display = "inline"
+          btnLoader.style.display = "none"
+          showError("Session expired or server error. Please refresh.")
+        }
+      })
+    })
+  })
+</script>
+{% endblock %}+
