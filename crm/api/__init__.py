@@ -1,12 +1,21 @@
 import frappe
+
 from bs4 import BeautifulSoup
+
 from frappe.core.api.file import get_max_file_size
+
 from frappe.translate import get_all_translations
+
 from frappe.utils import cstr, split_emails, validate_email_address
-from frappe.utils.telemetry import POSTHOG_HOST_FIELD, POSTHOG_PROJECT_FIELD
+
+# Telemetry imports - compatibility fix for Frappe v17
+try:
+	from frappe.utils.telemetry import POSTHOG_HOST_FIELD, POSTHOG_PROJECT_FIELD
+except ImportError:
+	POSTHOG_HOST_FIELD = "posthog_host"
+	POSTHOG_PROJECT_FIELD = "posthog_project_id"
 
 from crm.utils import is_frappe_version
-
 
 @frappe.whitelist(allow_guest=True)
 def get_translations():
@@ -14,9 +23,7 @@ def get_translations():
 		language = frappe.db.get_value("User", frappe.session.user, "language")
 	else:
 		language = frappe.db.get_single_value("System Settings", "language")
-
 	return get_all_translations(language)
-
 
 @frappe.whitelist()
 def get_user_signature():
@@ -30,13 +37,11 @@ def get_user_signature():
 		if user
 		else None
 	)
-
 	signature = user_email_signature or frappe.db.get_value(
 		"Email Account",
 		{"default_outgoing": 1, "add_signature": 1},
 		"signature",
 	)
-
 	if not signature:
 		return
 
@@ -45,11 +50,12 @@ def get_user_signature():
 	_signature = None
 	if html_signature:
 		_signature = html_signature.renderContents()
+
 	content = ""
 	if cstr(_signature) or signature:
 		content = f'<br><p class="signature">{signature}</p>'
-	return content
 
+	return content
 
 @frappe.whitelist()
 def get_posthog_settings():
@@ -60,13 +66,11 @@ def get_posthog_settings():
 		"telemetry_site_age": frappe.utils.telemetry.site_age(),
 	}
 
-
 def check_app_permission():
 	if frappe.session.user == "Administrator":
 		return True
 
 	allowed_modules = []
-
 	if is_frappe_version("15"):
 		allowed_modules = frappe.config.get_modules_from_all_apps_for_user()
 	elif is_frappe_version("16", above=True):
@@ -81,7 +85,6 @@ def check_app_permission():
 		return True
 
 	return False
-
 
 @frappe.whitelist(allow_guest=True)
 def accept_invitation(key: str | None = None):
@@ -101,7 +104,6 @@ def accept_invitation(key: str | None = None):
 		frappe.local.response["type"] = "redirect"
 		frappe.local.response["location"] = "https://crm.ipshopy.org/"
 
-
 @frappe.whitelist()
 def invite_by_email(emails: str, role: str):
 	frappe.only_for(["Sales Manager", "System Manager"])
@@ -114,9 +116,12 @@ def invite_by_email(emails: str, role: str):
 
 	email_string = validate_email_address(emails, throw=False)
 	email_list = split_emails(email_string)
+
 	if not email_list:
 		return
+
 	existing_members = frappe.db.get_all("User", filters={"email": ["in", email_list]}, pluck="email")
+
 	existing_invites = frappe.db.get_all(
 		"CRM Invitation",
 		filters={
@@ -137,11 +142,11 @@ def invite_by_email(emails: str, role: str):
 		"to_invite": to_invite,
 	}
 
-
 @frappe.whitelist()
 def get_file_uploader_defaults(doctype: str):
 	max_number_of_files = None
 	make_attachments_public = False
+
 	if doctype:
 		meta = frappe.get_meta(doctype)
 		max_number_of_files = meta.get("max_attachments")
