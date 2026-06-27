@@ -4,6 +4,12 @@ app_publisher = "IP Technologies Pvt. Ltd."
 app_description = "Kick-ass Open Source CRM"
 app_email = "support.ipcrm@gmail.com"
 app_license = "AGPLv3"
+# ═══════════════════════════════════════════════════════════════
+# LEAD ROUTING INTEGRATION
+# ═══════════════════════════════════════════════════════════════
+
+on_session_creation = "lead_routing.api.crm_access.patch_crm_permission"
+
 app_icon_url = "/assets/crm/images/logo.svg"
 app_icon_title = "CRM"
 app_icon_route = "/crm"
@@ -29,7 +35,7 @@ export_python_type_annotations = True
 
 # include js, css files in header of desk.html
 # app_include_css = "/assets/crm/css/crm.css"
-# app_include_js = "/assets/crm/js/crm.js"
+app_include_js = ["/assets/order_integration/js/crm_lead_list.js"]  # ← NEW
 
 # include js, css files in header of web template
 # web_include_css = "/assets/crm/css/crm.css"
@@ -121,7 +127,9 @@ before_uninstall = "crm.uninstall.before_uninstall"
 
 permission_query_conditions = {
 	"CRM Call Log": "crm.fcrm.doctype.crm_call_log.crm_call_log.get_permission_query_conditions",
+	"CRM Lead": "lead_routing.api.permissions.get_permission_query",  # ← NEW
 }
+
 
 # has_permission = {
 # "Event": "frappe.desk.doctype.event.event.has_permission",
@@ -160,8 +168,15 @@ doc_events = {
 		"on_update": ["crm.api.whatsapp.on_update"],
 	},
 	"CRM Lead": {
-		"after_insert": ["crm.integrations.interakt.api.send_welcome_message_to_lead_hook"],
+		"after_insert": [
+			"crm.integrations.interakt.api.send_welcome_message_to_lead_hook",
+			"lead_routing.api.lead_transfer.on_lead_created",  # ← NEW
+		],
+		"validate": [
+			"lead_routing.api.lead_transfer.on_lead_validate",  # ← NEW
+		],
 	},
+	# ... rest remains the same
 	"CRM Deal": {
 		"on_update": [
 			"crm.fcrm.doctype.erpnext_crm_settings.erpnext_crm_settings.create_customer_in_erpnext"
@@ -187,10 +202,17 @@ scheduler_events = {
 	"cron": {
 		"*/1 * * * *": ["crm.lead_syncing.background_sync.sync_leads_from_sources_5_minutes"],
 		"*/2 * * * *": ["crm.lead_syncing.background_sync.sync_leads_from_sources_2_minutes"],
-		"*/10 * * * *": ["crm.lead_syncing.background_sync.sync_leads_from_sources_10_minutes"],
+		"*/5 * * * *": ["order_integration.doctype.order_sync_source.order_sync_source.run_scheduled_sync_by_frequency"],  # ← NEW
+		"*/10 * * * *": [
+			"crm.lead_syncing.background_sync.sync_leads_from_sources_10_minutes",
+			"order_integration.doctype.order_sync_source.order_sync_source.run_scheduled_sync_by_frequency",  # ← NEW
+		],
 		"*/15 * * * *": ["crm.lead_syncing.background_sync.sync_leads_from_sources_15_minutes"],
+		"0 * * * *": ["order_integration.doctype.order_sync_source.order_sync_source.run_scheduled_sync_by_frequency"],  # ← NEW (hourly)
+		"0 0 * * *": ["order_integration.doctype.order_sync_source.order_sync_source.run_scheduled_sync_by_frequency"],  # ← NEW (daily)
 	},
 }
+
 
 # Testing
 # -------
@@ -200,9 +222,12 @@ scheduler_events = {
 # Overriding Methods
 # ------------------------------
 #
-# override_whitelisted_methods = {
-# "frappe.desk.doctype.event.event.get_events": "crm.event.get_events"
-# }
+# Overriding Methods
+# ------------------------------
+override_whitelisted_methods = {
+	"crm.api.doc.get_data": "order_integration.api.override_get_data.get_data"  # ← NEW
+}
+
 #
 # each overriding function accepts a `data` argument;
 # generated from the base implementation of the doctype dashboard,
@@ -222,8 +247,9 @@ ignore_links_on_delete = ["Failed Lead Sync Log"]
 
 # Request Events
 # ----------------
-# before_request = ["crm.utils.before_request"]
-# after_request = ["crm.utils.after_request"]
+before_request = ["lead_routing.api.crm_access.patch_crm_permission"]  # ← NEW
+after_request = ["order_integration.boot.inject_script_tag"]  # ← NEW
+
 
 # Job Events
 # ----------
