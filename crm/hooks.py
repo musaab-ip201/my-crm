@@ -176,6 +176,7 @@ doc_events = {
 			"lead_routing.api.lead_transfer.on_lead_validate",  # ← NEW
 		],
 	},
+	
 	# ... rest remains the same
 	"CRM Deal": {
 		"on_update": [
@@ -219,9 +220,6 @@ scheduler_events = {
 
 # before_tests = "crm.install.before_tests"
 
-# Overriding Methods
-# ------------------------------
-#
 # Overriding Methods
 # ------------------------------
 override_whitelisted_methods = {
