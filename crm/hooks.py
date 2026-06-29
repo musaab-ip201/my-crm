@@ -8,7 +8,7 @@ app_license = "AGPLv3"
 # LEAD ROUTING INTEGRATION
 # ═══════════════════════════════════════════════════════════════
 
-on_session_creation = "lead_routing.api.crm_access.patch_crm_permission"
+on_session_creation = "crm.lead_routing.api.crm_access.patch_crm_permission"
 
 app_icon_url = "/assets/crm/images/logo.svg"
 app_icon_title = "CRM"
@@ -127,7 +127,7 @@ before_uninstall = "crm.uninstall.before_uninstall"
 
 permission_query_conditions = {
 	"CRM Call Log": "crm.fcrm.doctype.crm_call_log.crm_call_log.get_permission_query_conditions",
-	"CRM Lead": "lead_routing.api.permissions.get_permission_query",  # ← NEW
+	"CRM Lead": "crm.lead_routing.api.permissions.get_permission_query",  # ← NEW
 }
 
 
@@ -170,10 +170,10 @@ doc_events = {
 	"CRM Lead": {
 		"after_insert": [
 			"crm.integrations.interakt.api.send_welcome_message_to_lead_hook",
-			"lead_routing.api.lead_transfer.on_lead_created",  # ← NEW
+			"crm.lead_routing.api.lead_transfer.on_lead_created",  # ← NEW
 		],
 		"validate": [
-			"lead_routing.api.lead_transfer.on_lead_validate",  # ← NEW
+			"crm.lead_routing.api.lead_transfer.on_lead_validate",  # ← NEW
 		],
 	},
 	
@@ -203,14 +203,14 @@ scheduler_events = {
 	"cron": {
 		"*/1 * * * *": ["crm.lead_syncing.background_sync.sync_leads_from_sources_5_minutes"],
 		"*/2 * * * *": ["crm.lead_syncing.background_sync.sync_leads_from_sources_2_minutes"],
-		"*/5 * * * *": ["order_integration.doctype.order_sync_source.order_sync_source.run_scheduled_sync_by_frequency"],  # ← NEW
+		"*/5 * * * *": ["crm.order_integration.doctype.order_sync_source.order_sync_source.run_scheduled_sync_by_frequency"],  # ← NEW
 		"*/10 * * * *": [
 			"crm.lead_syncing.background_sync.sync_leads_from_sources_10_minutes",
-			"order_integration.doctype.order_sync_source.order_sync_source.run_scheduled_sync_by_frequency",  # ← NEW
+			"crm.order_integration.doctype.order_sync_source.order_sync_source.run_scheduled_sync_by_frequency",  # ← NEW
 		],
 		"*/15 * * * *": ["crm.lead_syncing.background_sync.sync_leads_from_sources_15_minutes"],
-		"0 * * * *": ["order_integration.doctype.order_sync_source.order_sync_source.run_scheduled_sync_by_frequency"],  # ← NEW (hourly)
-		"0 0 * * *": ["order_integration.doctype.order_sync_source.order_sync_source.run_scheduled_sync_by_frequency"],  # ← NEW (daily)
+		"0 * * * *": ["crm.order_integration.doctype.order_sync_source.order_sync_source.run_scheduled_sync_by_frequency"],  # ← NEW (hourly)
+		"0 0 * * *": ["crm.order_integration.doctype.order_sync_source.order_sync_source.run_scheduled_sync_by_frequency"],  # ← NEW (daily)
 	},
 }
 
@@ -223,7 +223,7 @@ scheduler_events = {
 # Overriding Methods
 # ------------------------------
 override_whitelisted_methods = {
-	"crm.api.doc.get_data": "order_integration.api.override_get_data.get_data"  # ← NEW
+	"crm.api.doc.get_data": "crm.order_integration.api.override_get_data.get_data"  # ← NEW
 }
 
 #
@@ -245,8 +245,8 @@ ignore_links_on_delete = ["Failed Lead Sync Log"]
 
 # Request Events
 # ----------------
-before_request = ["lead_routing.api.crm_access.patch_crm_permission"]  # ← NEW
-after_request = ["order_integration.boot.inject_script_tag"]  # ← NEW
+before_request = ["crm.lead_routing.api.crm_access.patch_crm_permission"]  # ← NEW
+after_request = ["crm.order_integration.boot.inject_script_tag"]  # ← NEW
 
 
 # Job Events
