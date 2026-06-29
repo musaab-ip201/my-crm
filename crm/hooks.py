@@ -203,14 +203,14 @@ scheduler_events = {
 	"cron": {
 		"*/1 * * * *": ["crm.lead_syncing.background_sync.sync_leads_from_sources_5_minutes"],
 		"*/2 * * * *": ["crm.lead_syncing.background_sync.sync_leads_from_sources_2_minutes"],
-		"*/5 * * * *": ["crm.order_integration.doctype.order_sync_source.order_sync_source.run_scheduled_sync_by_frequency"],  # ← NEW
+		"*/5 * * * *": ["crm.fcrm.doctype.order_sync_source.order_sync_source.run_scheduled_sync_by_frequency"],  # ← NEW
 		"*/10 * * * *": [
 			"crm.lead_syncing.background_sync.sync_leads_from_sources_10_minutes",
-			"crm.order_integration.doctype.order_sync_source.order_sync_source.run_scheduled_sync_by_frequency",  # ← NEW
+			"crm.fcrm.doctype.order_sync_source.order_sync_source.run_scheduled_sync_by_frequency",  # ← NEW
 		],
 		"*/15 * * * *": ["crm.lead_syncing.background_sync.sync_leads_from_sources_15_minutes"],
-		"0 * * * *": ["crm.order_integration.doctype.order_sync_source.order_sync_source.run_scheduled_sync_by_frequency"],  # ← NEW (hourly)
-		"0 0 * * *": ["crm.order_integration.doctype.order_sync_source.order_sync_source.run_scheduled_sync_by_frequency"],  # ← NEW (daily)
+		"0 * * * *": ["crm.fcrm.doctype.order_sync_source.order_sync_source.run_scheduled_sync_by_frequency"],  # ← NEW (hourly)
+		"0 0 * * *": ["crm.fcrm.doctype.order_sync_source.order_sync_source.run_scheduled_sync_by_frequency"],  # ← NEW (daily)
 	},
 }
 
